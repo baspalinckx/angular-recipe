@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
-
+import { environment } from '../../environments/environment';
+import { Http, Headers, URLSearchParams } from '@angular/http';
 import { Recipe } from './recipe.model';
 import { Ingredient } from '../shared/ingredient.model';
 import { ShoppingListService } from '../shopping-list/shopping-list.service';
@@ -8,6 +9,9 @@ import { ShoppingListService } from '../shopping-list/shopping-list.service';
 @Injectable()
 export class RecipeService {
   recipesChanged = new Subject<Recipe[]>();
+
+  private headers = new Headers({'Content-Type': 'application/json'});
+  private serverUrl = environment.serverUrl ; // URL to web api
 
   private recipes: Recipe[] = [
     new Recipe(
@@ -27,10 +31,22 @@ export class RecipeService {
       ])
   ];
 
-  constructor(private slService: ShoppingListService) {}
+  constructor(private slService: ShoppingListService, private http: Http) {}
 
   getRecipes() {
-    return this.recipes.slice();
+    // return this.recipes.slice();
+    console.log('items ophalen van server');
+    return this.http.get(this.serverUrl + '/recipes', { headers: this.headers })
+      .toPromise()
+      .then(response => {
+        console.dir(response.json());
+        const test = response.json() as Recipe[];
+        this.recipes.push(test[0]);
+        return this.recipes;
+      })
+      .catch(error => {
+        return this.handleError(error);
+      });
   }
 
   getRecipe(index: number) {
@@ -54,5 +70,10 @@ export class RecipeService {
   deleteRecipe(index: number) {
     this.recipes.splice(index, 1);
     this.recipesChanged.next(this.recipes.slice());
+  }
+
+  private handleError(error: any): Promise<any> {
+    console.log('handleError');
+    return Promise.reject(error.message || error);
   }
 }

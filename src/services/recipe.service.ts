@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, URLSearchParams } from '@angular/http';
-import { environment } from '../../environments/environment';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Http, Headers } from '@angular/http';
+import { environment } from '../environments/environment';
 import 'rxjs/add/operator/toPromise';
-import { Observable } from 'rxjs/Observable';
-import {Recipe} from "../app/recipes/recipe.model";
+import {Recipe} from '../app/recipes/recipe.model';
 
 
 @Injectable()
@@ -24,7 +22,7 @@ export class UserService {
   //
   public getRecipes(): Promise<Recipe[]> {
     console.log('items ophalen van server');
-    return this.http.get(this.serverUrl, { headers: this.headers })
+    return this.http.get(this.serverUrl + '/recipes', { headers: this.headers })
       .toPromise()
       .then(response => {
         console.dir(response.json());
@@ -35,9 +33,9 @@ export class UserService {
       });
   }
 
-  public getRecipesByID(): Promise<Recipe[]> {
+  public getRecipesByID(id: Number): Promise<Recipe[]> {
     console.log('items ophalen van server');
-    return this.http.get(this.serverUrl, { headers: this.headers })
+    return this.http.get(this.serverUrl + '/recipes/' + id, { headers: this.headers })
       .toPromise()
       .then(response => {
         console.dir(response.json());
@@ -48,7 +46,7 @@ export class UserService {
       });
   }
 
-  public
+
 
 
 
